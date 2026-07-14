@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>梅花易数 · 网页版</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #fdf8f0;
+      color: #333;
+      padding: 20px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+      color: #8b5a2b;
+    }
+    .ganzhi-bar {
+      background: #fff9f0;
+      border: 1px solid #e0c8a8;
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 16px;
+      color: #5a3e2b;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+    .wuxing-wood { color: #2E7D32; font-weight: bold; }
+    .wuxing-fire { color: #C62828; font-weight: bold; }
+    .wuxing-earth { color: #B8860B; font-weight: bold; }
+    .wuxing-metal { color: #DAA520; font-weight: bold; }
+    .wuxing-water { color: #1a1a2e; font-weight: bold; }
+
+    .input-section { margin-bottom: 25px; }
+    .input-group {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .input-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .input-field {
+      flex: 1;
+    }
+    .input-field input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 18px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .input-field input:focus { border-color: #d4a373; }
+    .operator {
+      font-size: 22px;
+      color: #b5838d;
+      font-weight: bold;
+    }
+    .result-badge {
+      background: #eee;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      min-width: 50px;
+      text-align: center;
+      color: white;
+    }
+    .divine-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #d4a373, #b5838d);
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: opacity 0.2s;
+    }
+    .divine-btn:hover { opacity: 0.9; }
+
+    .gua-row {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    .gua-column {
+      flex: 1 1 200px;
+      min-width: 180px;
+      max-width: 350px;
+      display: flex;
+    }
+    .gua-section {
+      background: white;
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .gua-header {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .gua-num {
+      background: #d4a373;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    .gua-name { font-size: 18px; font-weight: bold; }
+
+    .gua-sub {
+      color: #888;
+      font-size: 12px;
+      text-align: center;
+      display: block;
+      margin: 3px 0 6px;
+    }
+
+    .yao-list {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      margin: 6px 0;
+    }
+    .yao-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 20px;
+    }
+    .yao-line {
+      width: 50px;
+      height: 7px;
+      border-radius: 4px;
+    }
+    .yao-yang { background: #555; }
+    .yao-yin {
+      background: none;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+    }
+    .yao-yin-half {
+      width: 22px;
+      height: 7px;
+      background: #555;
+      border-radius: 4px;
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+    .yao-dong {
+      animation: blink 0.8s ease-in-out infinite;
+    }
+
+    .wuxing-strip {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 6px 0;
+      font-size: 13px;
+    }
+    .wx-item { opacity: 0.3; transition: 0.2s; }
+    .wx-item.active { opacity: 1; font-weight: bold; }
+
+    .gua-text {
+      background: #fdf6ee;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #6b4e3d;
+      line-height: 1.5;
+      margin-top: auto;
+    }
+
+    .xunkong-info {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+    .xk-badge {
+      background: #f0e6d2;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .pay-guide {
+      background: #fff5e6;
+      border: 2px dashed #d4a373;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 25px;
+      text-align: center;
+    }
+    .pay-guide h3 { color: #b5838d; margin-bottom: 10px; }
+    .pay-guide p { margin: 8px 0; line-height: 1.8; }
+    .pay-qrcode {
+      width: 200px;
+      border-radius: 12px;
+      margin: 15px 0;
+      border: 3px solid #d4a373;
+    }
+    .wechat-id {
+      font-weight: bold;
+      color: #C62828;
+      font-size: 18px;
+      background: #ffeaea;
+      padding: 4px 12px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    /* 留言表单样式 */
+    .message-form {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .message-form h3 {
+      color: #8b5a2b;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #d4a373;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #8b5a2b;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover {
+      background: #6b4226;
+    }
+  </style>
+</head>
+<body>
+  <div class="title">☯️ 梅花易数</div>
+  <div class="ganzhi-bar" id="ganzhiBar"></div>
+
+  <div class="input-section">
+    <div class="input-group">
+      <div class="input-label">
+        <div class="icon" style="background: #2E7D32;">上</div>
+        <span>上卦数字</span>
+      </div>
+      <div class="input-row">
+        <div class="input-field">
+          <input type="number" placeholder="输入数字" id="shangInput">
+        </div>
+        <span class="operator">→</span>
+        <div class="result-badge" id="shangBadge" style="display:none;"></div>
+      </div>
+    </div>
+    <div class="input-group">
+      <div class="input-label">
+        <div class="icon" style="background: #C62828;">下</div>
+        <span>下卦数字</span>
+      </div>
+      <div class="input-row">
+        <div class="input-field">
+          <input type="number" placeholder="输入数字" id="xiaInput">
+        </div>
+        <span class="operator">→</span>
+        <div class="result-badge" id="xiaBadge" style="display:none;"></div>
+      </div>
+    </div>
+    <div class="input-group">
+      <div class="input-label">
+        <div class="icon" style="background: #B8860B;">变</div>
+        <span>变爻数字</span>
+      </div>
+      <div class="input-row">
+        <div class="input-field">
+          <input type="digit" placeholder="输入数字" id="bianInput">
+        </div>
+        <span class="operator">→</span>
+        <div class="result-badge" id="bianBadge" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+  <button class="divine-btn" id="divineBtn">🔥 开始起卦</button>
+  <div id="resultArea" style="display: none;"></div>
+
+  <script>
+    // ========== 数据与算法（同前，未改动） ==========
+    const baguaData = {
+      1: { name: '乾', symbol: '☰', wuxing: 'metal', wuxingName: '金', yao: [1,1,1], desc: '天行健，君子以自强不息' },
+      2: { name: '兑', symbol: '☱', wuxing: 'metal', wuxingName: '金', yao: [0,1,1], desc: '丽泽兑，君子以朋友讲习' },
+      3: { name: '离', symbol: '☲', wuxing: 'fire', wuxingName: '火', yao: [1,0,1], desc: '明两作离，大人以继明照于四方' },
+      4: { name: '震', symbol: '☳', wuxing: 'wood', wuxingName: '木', yao: [0,0,1], desc: '洊雷震，君子以恐惧修省' },
+      5: { name: '巽', symbol: '☴', wuxing: 'wood', wuxingName: '木', yao: [1,1,0], desc: '随风巽，君子以申命行事' },
+      6: { name: '坎', symbol: '☵', wuxing: 'water', wuxingName: '水', yao: [0,1,0], desc: '水洊至习坎，君子以常德行习教事' },
+      7: { name: '艮', symbol: '☶', wuxing: 'earth', wuxingName: '土', yao: [1,0,0], desc: '兼山艮，君子以思不出其位' },
+      8: { name: '坤', symbol: '☷', wuxing: 'earth', wuxingName: '土', yao: [0,0,0], desc: '地势坤，君子以厚德载物' }
+    };
+
+    const gua64List = [
+      { key: '乾乾', name: '乾为天', num: 1 },{ key: '坤坤', name: '坤为地', num: 2 },
+      { key: '坎震', name: '水雷屯', num: 3 },{ key: '艮坎', name: '山水蒙', num: 4 },
+      { key: '坎乾', name: '水天需', num: 5 },{ key: '乾坎', name: '天水讼', num: 6 },
+      { key: '坤坎', name: '地水师', num: 7 },{ key: '坎坤', name: '水地比', num: 8 },
+      { key: '巽乾', name: '风天小畜', num: 9 },{ key: '乾兑', name: '天泽履', num: 10 },
+      { key: '坤乾', name: '地天泰', num: 11 },{ key: '乾坤', name: '天地否', num: 12 },
+      { key: '乾离', name: '天火同人', num: 13 },{ key: '离乾', name: '火天大有', num: 14 },
+      { key: '坤艮', name: '地山谦', num: 15 },{ key: '震坤', name: '雷地豫', num: 16 },
+      { key: '兑震', name: '泽雷随', num: 17 },{ key: '艮巽', name: '山风蛊', num: 18 },
+      { key: '坤兑', name: '地泽临', num: 19 },{ key: '巽坤', name: '风地观', num: 20 },
+      { key: '离震', name: '火雷噬嗑', num: 21 },{ key: '艮离', name: '山火贲', num: 22 },
+      { key: '艮坤', name: '山地剥', num: 23 },{ key: '坤震', name: '地雷复', num: 24 },
+      { key: '乾震', name: '天雷无妄', num: 25 },{ key: '艮乾', name: '山天大畜', num: 26 },
+      { key: '艮震', name: '山雷颐', num: 27 },{ key: '兑巽', name: '泽风大过', num: 28 },
+      { key: '坎坎', name: '坎为水', num: 29 },{ key: '离离', name: '离为火', num: 30 },
+      { key: '兑艮', name: '泽山咸', num: 31 },{ key: '震巽', name: '雷风恒', num: 32 },
+      { key: '乾艮', name: '天山遁', num: 33 },{ key: '震乾', name: '雷天大壮', num: 34 },
+      { key: '离坤', name: '火地晋', num: 35 },{ key: '坤离', name: '地火明夷', num: 36 },
+      { key: '巽离', name: '风火家人', num: 37 },{ key: '离兑', name: '火泽睽', num: 38 },
+      { key: '坎艮', name: '水山蹇', num: 39 },{ key: '震坎', name: '雷水解', num: 40 },
+      { key: '艮兑', name: '山泽损', num: 41 },{ key: '巽震', name: '风雷益', num: 42 },
+      { key: '兑乾', name: '泽天夬', num: 43 },{ key: '乾巽', name: '天风姤', num: 44 },
+      { key: '兑坤', name: '泽地萃', num: 45 },{ key: '坤巽', name: '地风升', num: 46 },
+      { key: '兑坎', name: '泽水困', num: 47 },{ key: '坎巽', name: '水风井', num: 48 },
+      { key: '兑离', name: '泽火革', num: 49 },{ key: '离巽', name: '火风鼎', num: 50 },
+      { key: '震震', name: '震为雷', num: 51 },{ key: '艮艮', name: '艮为山', num: 52 },
+      { key: '巽艮', name: '风山渐', num: 53 },{ key: '震兑', name: '雷泽归妹', num: 54 },
+      { key: '震离', name: '雷火丰', num: 55 },{ key: '离艮', name: '火山旅', num: 56 },
+      { key: '巽巽', name: '巽为风', num: 57 },{ key: '兑兑', name: '兑为泽', num: 58 },
+      { key: '巽坎', name: '风水涣', num: 59 },{ key: '坎兑', name: '水泽节', num: 60 },
+      { key: '离坎', name: '水火既济', num: 61 },{ key: '坎离', name: '火水未济', num: 62 }
+    ];
+
+    const gua64Desc = {
+      '乾乾': '元亨利贞。大哉乾元，万物资始，乃统天。',
+      '坤坤': '元亨，利牝马之贞。',
+      '坎震': '屯，元亨利贞，勿用有攸往，利建侯。',
+      '艮坎': '蒙，亨。匪我求童蒙，童蒙求我。',
+      '坎乾': '需，有孚，光亨，贞吉，利涉大川。',
+      '乾坎': '讼，有孚，窒惕中吉，终凶。',
+      '坤坎': '师，贞，丈人吉，无咎。',
+      '坎坤': '比，吉。原筮元永贞，无咎。',
+      '巽乾': '小畜，亨。密云不雨，自我西郊。',
+      '乾兑': '履虎尾，不咥人，亨。',
+      '坤乾': '泰，小往大来，吉亨。',
+      '乾坤': '否之匪人，不利君子贞，大往小来。',
+      '乾离': '同人于野，亨。利涉大川，利君子贞。',
+      '离乾': '大有，元亨。',
+      '坤艮': '谦，亨，君子有终。',
+      '震坤': '豫，利建侯行师。',
+      '兑震': '随，元亨利贞，无咎。',
+      '艮巽': '蛊，元亨，利涉大川，先甲三日，后甲三日。',
+      '坤兑': '临，元亨利贞，至于八月有凶。',
+      '巽坤': '观，盥而不荐，有孚颙若。',
+      '离震': '噬嗑，亨，利用狱。',
+      '艮离': '贲，亨，小利有攸往。',
+      '艮坤': '剥，不利有攸往。',
+      '坤震': '复，亨。出入无疾，朋来无咎。',
+      '乾震': '无妄，元亨利贞。其匪正有眚，不利有攸往。',
+      '艮乾': '大畜，利贞，不家食吉，利涉大川。',
+      '艮震': '颐，贞吉，观颐，自求口实。',
+      '兑巽': '大过，栋桡，利有攸往，亨。',
+      '坎坎': '习坎，有孚，维心亨，行有尚。',
+      '离离': '离，利贞，亨。畜牝牛，吉。',
+      '兑艮': '咸，亨，利贞，取女吉。',
+      '震巽': '恒，亨，无咎，利贞，利有攸往。',
+      '乾艮': '遁，亨，小利贞。',
+      '震乾': '大壮，利贞。',
+      '离坤': '晋，康侯用锡马蕃庶，昼日三接。',
+      '坤离': '明夷，利艰贞。',
+      '巽离': '家人，利女贞。',
+      '离兑': '睽，小事吉。',
+      '坎艮': '蹇，利西南，不利东北，利见大人，贞吉。',
+      '震坎': '解，利西南，无所往，其来复吉。',
+      '艮兑': '损，有孚，元吉，无咎，可贞，利有攸往。',
+      '巽震': '益，利有攸往，利涉大川。',
+      '兑乾': '夬，扬于王庭，孚号有厉。',
+      '乾巽': '姤，女壮，勿用取女。',
+      '兑坤': '萃，亨。王假有庙，利见大人。',
+      '坤巽': '升，元亨，用见大人，勿恤，南征吉。',
+      '兑坎': '困，亨，贞，大人吉，无咎。',
+      '坎巽': '井，改邑不改井，无丧无得，往来井井。',
+      '兑离': '革，巳日乃孚，元亨利贞，悔亡。',
+      '离巽': '鼎，元吉，亨。',
+      '震震': '震，亨。震来虩虩，笑言哑哑。',
+      '艮艮': '艮，艮其背，不获其身，行其庭，不见其人，无咎。',
+      '巽艮': '渐，女归吉，利贞。',
+      '震兑': '归妹，征凶，无攸利。',
+      '震离': '丰，亨，王假之，勿忧，宜日中。',
+      '离艮': '旅，小亨，旅贞吉。',
+      '巽巽': '巽，小亨，利有攸往，利见大人。',
+      '兑兑': '兑，亨，利贞。',
+      '巽坎': '涣，亨。王假有庙，利涉大川，利贞。',
+      '坎兑': '节，亨，苦节不可贞。',
+      '离坎': '既济，亨，小利贞，初吉终乱。',
+      '坎离': '未济，亨，小狐汔济，濡其尾，无攸利。'
+    };
+
+    const wuxingColors = {
+      wood: '#2E7D32', fire: '#C62828', earth: '#B8860B', metal: '#DAA520', water: '#1a1a2e', gold: '#c9a84c'
+    };
+
+    const TianGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+    const DiZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const ganWx = ['wood','wood','fire','fire','earth','earth','metal','metal','water','water'];
+    const zhiWx = ['water','earth','wood','wood','earth','fire','fire','earth','metal','metal','earth','water'];
+    const zhiToGua = {
+      '子': { name: '坎', symbol: '☵', wuxing: 'water' },
+      '丑': { name: '艮', symbol: '☶', wuxing: 'earth' },
+      '寅': { name: '震', symbol: '☳', wuxing: 'wood' },
+      '卯': { name: '巽', symbol: '☴', wuxing: 'wood' },
+      '辰': { name: '巽', symbol: '☴', wuxing: 'wood' },
+      '巳': { name: '巽', symbol: '☴', wuxing: 'wood' },
+      '午': { name: '离', symbol: '☲', wuxing: 'fire' },
+      '未': { name: '坤', symbol: '☷', wuxing: 'earth' },
+      '申': { name: '乾', symbol: '☰', wuxing: 'metal' },
+      '酉': { name: '兑', symbol: '☱', wuxing: 'metal' },
+      '戌': { name: '乾', symbol: '☰', wuxing: 'metal' },
+      '亥': { name: '乾', symbol: '☰', wuxing: 'metal' }
+    };
+
+    function getGanZhiYear(year) {
+      let gan = TianGan[(year - 4) % 10];
+      let zhi = DiZhi[(year - 4) % 12];
+      return gan + zhi;
+    }
+
+    function getLunarMonth(date) {
+      const year = date.getFullYear();
+      const liChun = new Date(year, 1, 4);
+      if (date < liChun) return { year: year - 1, month: 12, isLeap: false };
+
+      const jieQiMonth = [
+        { month: 2, day: 4, lunarMonth: 1 },{ month: 3, day: 5, lunarMonth: 2 },
+        { month: 4, day: 5, lunarMonth: 3 },{ month: 5, day: 5, lunarMonth: 4 },
+        { month: 6, day: 5, lunarMonth: 5 },{ month: 7, day: 7, lunarMonth: 6 },
+        { month: 8, day: 7, lunarMonth: 7 },{ month: 9, day: 7, lunarMonth: 8 },
+        { month: 10, day: 8, lunarMonth: 9 },{ month: 11, day: 7, lunarMonth: 10 },
+        { month: 12, day: 7, lunarMonth: 11 },{ month: 1, day: 5, lunarMonth: 12 }
+      ];
+
+      let lunarMonth = 1;
+      for (let i = 0; i < jieQiMonth.length; i++) {
+        const jq = jieQiMonth[i];
+        let jqYear = year;
+        if (jq.month === 1) jqYear = year + 1;
+        const jqDate = new Date(jqYear, jq.month - 1, jq.day);
+        if (date >= jqDate) lunarMonth = jq.lunarMonth;
+        else break;
+      }
+      return { year: year, month: lunarMonth, isLeap: false };
+    }
+
+    function getGanZhiMonth(year, month, day) {
+      const lunar = getLunarMonth(new Date(year, month - 1, day));
+      const lunarYear = lunar.year;
+      const lunarMonth = lunar.month;
+      const yearGanIdx = (lunarYear - 4) % 10;
+
+      let monthGanStart;
+      if (yearGanIdx === 0 || yearGanIdx === 5) monthGanStart = 2;
+      else if (yearGanIdx === 1 || yearGanIdx === 6) monthGanStart = 4;
+      else if (yearGanIdx === 2 || yearGanIdx === 7) monthGanStart = 6;
+      else if (yearGanIdx === 3 || yearGanIdx === 8) monthGanStart = 8;
+      else monthGanStart = 0;
+
+      const zhiMap = [2,3,4,5,6,7,8,9,10,11,0,1];
+      const monthZhiIdx = zhiMap[lunarMonth - 1];
+      const monthGanIdx = (monthGanStart + lunarMonth - 1) % 10;
+      return TianGan[monthGanIdx] + DiZhi[monthZhiIdx];
+    }
+
+    function getGanZhiDay(date) {
+      let baseDate = new Date(1900, 0, 31);
+      let offset = Math.floor((date - baseDate) / 86400000);
+      let gan = TianGan[offset % 10];
+      let zhi = DiZhi[(offset + 4) % 12];
+      return gan + zhi;
+    }
+
+    function getGanZhiHour(dayGan, hour) {
+      const shiChen = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      const idx = Math.floor((hour + 1) / 2) % 12;
+      const zhi = shiChen[idx];
+      let dayGanIdx = TianGan.indexOf(dayGan.charAt(0));
+      let hourGanStart = 0;
+      if (dayGanIdx === 0 || dayGanIdx === 5) hourGanStart = 0;
+      else if (dayGanIdx === 1 || dayGanIdx === 6) hourGanStart = 2;
+      else if (dayGanIdx === 2 || dayGanIdx === 7) hourGanStart = 4;
+      else if (dayGanIdx === 3 || dayGanIdx === 8) hourGanStart = 6;
+      else if (dayGanIdx === 4 || dayGanIdx === 9) hourGanStart = 8;
+      let gan = TianGan[(hourGanStart + idx) % 10];
+      return gan + zhi;
+    }
+
+    function getCharWuxing(char) {
+      const ganIdx = TianGan.indexOf(char);
+      const zhiIdx = DiZhi.indexOf(char);
+      if (ganIdx >= 0) return ganWx[ganIdx];
+      if (zhiIdx >= 0) return zhiWx[zhiIdx];
+      return '';
+    }
+
+    function parseGanZhiColor(gzStr) {
+      return gzStr.split('').map(ch => ({ char: ch, wx: getCharWuxing(ch) }));
+    }
+
+    function getXunKong(dayGan, dayZhi) {
+      const ganIdx = TianGan.indexOf(dayGan);
+      const zhiIdx = DiZhi.indexOf(dayZhi);
+      const xunShouZhi = (zhiIdx - ganIdx + 12) % 12;
+      const kong1 = (xunShouZhi + 10) % 12;
+      const kong2 = (xunShouZhi + 11) % 12;
+      return {
+        kong: DiZhi[kong1] + DiZhi[kong2],
+        gua1: zhiToGua[DiZhi[kong1]],
+        gua2: zhiToGua[DiZhi[kong2]]
+      };
+    }
+
+    function formatGanZhiDate(date) {
+      const lunarInfo = getLunarMonth(date);
+      const yearGZ = getGanZhiYear(lunarInfo.year);
+      const monthGZ = getGanZhiMonth(date.getFullYear(), date.getMonth()+1, date.getDate());
+      const dayGZ = getGanZhiDay(date);
+      const hourGZ = getGanZhiHour(dayGZ, date.getHours());
+      const xunKong = getXunKong(dayGZ.charAt(0), dayGZ.charAt(1));
+      return {
+        year: yearGZ+'年', month: monthGZ+'月', day: dayGZ+'日', hour: hourGZ+'时',
+        full: `${yearGZ}年 ${monthGZ}月 ${dayGZ}日 ${hourGZ}时`,
+        yearColor: parseGanZhiColor(yearGZ), monthColor: parseGanZhiColor(monthGZ),
+        dayColor: parseGanZhiColor(dayGZ), hourColor: parseGanZhiColor(hourGZ),
+        xunKong: xunKong.kong, xunKongGua1: xunKong.gua1, xunKongGua2: xunKong.gua2
+      };
+    }
+
+    function findGuaInfo(key) {
+      let item = gua64List.find(g => g.key === key);
+      if (item) return { name: item.name, num: item.num, desc: gua64Desc[item.key] || '' };
+      const reversedKey = key.charAt(1) + key.charAt(0);
+      item = gua64List.find(g => g.key === reversedKey);
+      if (item) return { name: item.name, num: item.num, desc: gua64Desc[item.key] || '' };
+      return { name: key, num: 0, desc: '' };
+    }
+
+    function getGuaByYao(yaoArr) {
+      for (let key in baguaData) {
+        if (JSON.stringify(baguaData[key].yao) === JSON.stringify(yaoArr)) return baguaData[key];
+      }
+      return baguaData[8];
+    }
+
+    // ========== UI 交互 ==========
+    function calcMod(num, mod) {
+      if (!num || num <= 0) return null;
+      let r = num % mod;
+      return r === 0 ? mod : r;
+    }
+
+    function getWxColor(wx) { return wuxingColors[wx] || '#666'; }
+
+    function updateBadge(inputId, badgeId, modVal) {
+      const n = parseInt(document.getElementById(inputId).value);
+      const badge = document.getElementById(badgeId);
+      if (isNaN(n) || n <= 0) { badge.style.display = 'none'; return null; }
+      const mod = calcMod(n, modVal);
+      if (mod) {
+        const data = baguaData[mod];
+        badge.textContent = data.name + ' ' + data.symbol;
+        badge.style.backgroundColor = getWxColor(data.wuxing);
+        badge.style.display = 'inline-block';
+        return mod;
+      } else {
+        badge.style.display = 'none';
+        return null;
+      }
+    }
+
+    document.getElementById('shangInput').addEventListener('input', ()=> updateBadge('shangInput','shangBadge',8));
+    document.getElementById('xiaInput').addEventListener('input', ()=> updateBadge('xiaInput','xiaBadge',8));
+    document.getElementById('bianInput').addEventListener('input', ()=>{
+      const n = parseInt(document.getElementById('bianInput').value);
+      const badge = document.getElementById('bianBadge');
+      if (isNaN(n) || n <= 0) { badge.style.display = 'none'; return; }
+      const mod = calcMod(n, 6);
+      if (mod) {
+        badge.textContent = '第' + mod + '爻';
+        badge.style.backgroundColor = '#B8860B';
+        badge.style.display = 'inline-block';
+      } else badge.style.display = 'none';
+    });
+
+    function updateGanzhiBar() {
+      const now = new Date();
+      const gz = formatGanZhiDate(now);
+      const container = document.getElementById('ganzhiBar');
+      const makeSpan = (char, wx) => `<span class="wuxing-${wx}">${char}</span>`;
+      let html = '';
+      gz.yearColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '年 ';
+      gz.monthColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '月 ';
+      gz.dayColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '日 ';
+      gz.hourColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '时';
+      container.innerHTML = html;
+    }
+    updateGanzhiBar();
+
+    // 生成结果页面顶部的干支条（和首页一样）
+    function getGanzhiBarHTML(gz) {
+      const makeSpan = (char, wx) => `<span class="wuxing-${wx}">${char}</span>`;
+      let html = '';
+      gz.yearColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '年 ';
+      gz.monthColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '月 ';
+      gz.dayColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '日 ';
+      gz.hourColor.forEach(c => html += makeSpan(c.char, c.wx)); html += '时';
+      return `<div class="ganzhi-bar">${html}</div>`;
+    }
+
+    document.getElementById('divineBtn').addEventListener('click', ()=>{
+      const shangNum = parseInt(document.getElementById('shangInput').value);
+      const xiaNum = parseInt(document.getElementById('xiaInput').value);
+      const bianNum = parseInt(document.getElementById('bianInput').value);
+      if (!shangNum || !xiaNum || !bianNum) {
+        alert('请填写完整的三个数字');
+        return;
+      }
+      const shangGua = calcMod(shangNum, 8);
+      const xiaGua = calcMod(xiaNum, 8);
+      const bianYao = calcMod(bianNum, 6);
+      if (!shangGua || !xiaGua || !bianYao) {
+        alert('输入数字需大于0');
+        return;
+      }
+
+      const now = new Date();
+      const gz = formatGanZhiDate(now);
+
+      const shangYao = [...baguaData[shangGua].yao];
+      const xiaYao = [...baguaData[xiaGua].yao];
+      const benYao = [...shangYao, ...xiaYao];
+      const shangWx = baguaData[shangGua].wuxing;
+      const xiaWx = baguaData[xiaGua].wuxing;
+
+      const bianYaoArr = [...benYao];
+      bianYaoArr[6 - bianYao] = bianYaoArr[6 - bianYao] === 1 ? 0 : 1;
+
+      const huShang = [benYao[1], benYao[2], benYao[3]];
+      const huXia = [benYao[2], benYao[3], benYao[4]];
+      const huYao = [...huShang, ...huXia];
+
+      const shangName = baguaData[shangGua].name;
+      const xiaName = baguaData[xiaGua].name;
+      const benInfo = findGuaInfo(shangName + xiaName);
+
+      const bianShangYao = bianYaoArr.slice(0,3);
+      const bianXiaYao = bianYaoArr.slice(3,6);
+      const bianShangGua = getGuaByYao(bianShangYao);
+      const bianXiaGua = getGuaByYao(bianXiaYao);
+      const bianInfo = findGuaInfo(bianShangGua.name + bianXiaGua.name);
+
+      const huShangGua = getGuaByYao(huShang);
+      const huXiaGua = getGuaByYao(huXia);
+      const huInfo = findGuaInfo(huShangGua.name + huXiaGua.name);
+
+      const buildYaoHtml = (yaoArr, bianIndex, shangWx, xiaWx) => {
+        let html = '';
+        for (let i=0; i<6; i++) {
+          const yaoPos = 6-i;
+          const isBian = (yaoPos === bianIndex);
+          const isShang = i<=2;
+          const wx = isShang ? shangWx : xiaWx;
+          const color = getWxColor(wx);
+          const dongClass = isBian ? ' yao-dong' : '';
+          if (yaoArr[i] === 1) {
+            html += `<div class="yao-row"><div class="yao-line yao-yang${dongClass}" style="background:${color}"></div></div>`;
+          } else {
+            html += `<div class="yao-row yao-yin"><div class="yao-yin-half${dongClass}" style="background:${color}"></div><div class="yao-yin-half${dongClass}" style="background:${color}"></div></div>`;
+          }
+        }
+        return html;
+      };
+
+      const buildWxStrip = (activeWxList) => {
+        const wxs = ['wood','fire','earth','metal','water'];
+        const names = { wood:'木',fire:'火',earth:'土',metal:'金',water:'水' };
+        let html = '';
+        wxs.forEach(w=>{
+          html += `<span class="wx-item ${activeWxList.includes(w)?'active':''}" style="color:${getWxColor(w)}">${names[w]}</span>`;
+        });
+        return html;
+      };
+
+      // 结果HTML，顶部加入干支条，底部加入留言表单
+      const resultHTML = `
+        ${getGanzhiBarHTML(gz)}
+        <div class="gua-row">
+          <div class="gua-column">
+            <div class="gua-section">
+              <div class="gua-header">
+                <span class="gua-num">本卦 ${benInfo.num}</span>
+                <span class="gua-name">${benInfo.name}</span>
+              </div>
+              <div class="yao-list">${buildYaoHtml(benYao, bianYao, shangWx, xiaWx)}</div>
+              <div class="gua-sub">上${shangName}下${xiaName}</div>
+              <div class="wuxing-strip">${buildWxStrip([shangWx, xiaWx])}</div>
+              <div class="gua-text">${benInfo.desc}</div>
+            </div>
+          </div>
+          <div class="gua-column">
+            <div class="gua-section">
+              <div class="gua-header">
+                <span class="gua-num">互卦 ${huInfo.num}</span>
+                <span class="gua-name">${huInfo.name}</span>
+              </div>
+              <div class="yao-list">${buildYaoHtml(huYao, null, huShangGua.wuxing, huXiaGua.wuxing)}</div>
+              <div class="gua-sub">上${huShangGua.name}下${huXiaGua.name}</div>
+              <div class="wuxing-strip">${buildWxStrip([huShangGua.wuxing, huXiaGua.wuxing])}</div>
+              <div class="gua-text">${huInfo.desc}</div>
+            </div>
+          </div>
+          <div class="gua-column">
+            <div class="gua-section">
+              <div class="gua-header">
+                <span class="gua-num">变卦 ${bianInfo.num}</span>
+                <span class="gua-name">${bianInfo.name}</span>
+              </div>
+              <div class="yao-list">${buildYaoHtml(bianYaoArr, null, bianShangGua.wuxing, bianXiaGua.wuxing)}</div>
+              <div class="gua-sub">上${bianShangGua.name}下${bianXiaGua.name}</div>
+              <div class="wuxing-strip">${buildWxStrip([bianShangGua.wuxing, bianXiaGua.wuxing])}</div>
+              <div class="gua-text">${bianInfo.desc}</div>
+            </div>
+          </div>
+        </div>
+        <div class="xunkong-info">
+          <span>旬空：${gz.xunKong}</span>
+          <span class="xk-badge">${gz.xunKongGua1.symbol}${gz.xunKongGua1.name}</span>
+          <span class="xk-badge">${gz.xunKongGua2.symbol}${gz.xunKongGua2.name}</span>
+        </div>
+        <div class="pay-guide">
+          <h3>🔮 需要人工详细解卦吗？</h3>
+          <p>微信扫码支付 <strong>¥XX</strong>，并将此页面截图发送至微信</p>
+          <img class="pay-qrcode" src="qrcode.png" alt="收款码">
+          <p>微信号：<span class="wechat-id">your_wechat_id</span></p>
+          <p style="font-size:13px; color:#888;">支付后2小时内为你人工解读</p>
+        </div>
+        <div class="message-form">
+          <h3>💬 给我留言</h3>
+          <div class="form-group">
+            <label>您的称呼</label>
+            <input type="text" id="msgName" placeholder="请输入您的名字">
+          </div>
+          <div class="form-group">
+            <label>您的邮箱</label>
+            <input type="email" id="msgEmail" placeholder="请输入您的邮箱">
+          </div>
+          <div class="form-group">
+            <label>留言内容</label>
+            <textarea id="msgContent" placeholder="请写下您的建议、需求或其他想说的话..."></textarea>
+          </div>
+          <button class="submit-btn" id="sendMsgBtn">✉️ 发送留言</button>
+        </div>
+      `;
+
+      document.getElementById('resultArea').innerHTML = resultHTML;
+      document.getElementById('resultArea').style.display = 'block';
+      document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+
+      // 绑定留言发送按钮（使用mailto）
+      document.getElementById('sendMsgBtn').addEventListener('click', ()=>{
+        const name = document.getElementById('msgName').value.trim();
+        const email = document.getElementById('msgEmail').value.trim();
+        const content = document.getElementById('msgContent').value.trim();
+        if (!name || !email || !content) {
+          alert('请填写完整的姓名、邮箱和留言内容');
+          return;
+        }
+        const subject = encodeURIComponent('【梅花易数留言】来自 ' + name);
+        const body = encodeURIComponent(
+          `称呼：${name}\n邮箱：${email}\n留言内容：\n${content}`
+        );
+        window.location.href = `mailto:ddddsss12222@163.com?subject=${subject}&body=${body}`;
+      });
+    });
+  </script>
+</body>
+</html>
